@@ -1,4 +1,20 @@
-What is happening, my man?<br>
-{% for id, category in list %}
-	{{ id }}, {{ category }}<br>
+<table>
+	<tr>
+		<th>Story ID</th>
+		<th>CMS<br>Story ID</th>
+		<th>Story Name</th>
+		<th>Pageset Name</th>
+		<th>Section<br>Letter</th>
+		<th>Page<br>Number</th>
+		<th>Total<br>Depth</th>
+		<th>Author</th>
+		<th>Origin</th>
+		<th>Subcategory ID</th>
+		<th>SEO URL string</th>
+	</tr>
+{% for storyId, cmsStoryId, storyName, pageSetName, letter, pageNum, totalDepth, author, origin, subcategoryId, seourl in list %}
+	<tr>
+		<td>{{ storyId }}</td><td>{{ cmsStoryId }}</td><td><a href="{{ storyId }}">{{ storyName }}</a></td><td>{{ pageSetName }}</td><td>{{ letter }}</td><td>{{ pageNum }}</td><td>{{ totalDepth }}</td><td>{{ author }}</td><td>{{ origin }}</td><td>{{ subcategoryId }}</td><td>{{ seourl }}</td>
+	</tr>
 {% endfor %}
+</table>
