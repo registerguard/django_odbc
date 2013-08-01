@@ -1,3 +1,11 @@
 {% for item in detail_list %}
-	<p>{{ item }}</p>
+	
+	DTI Element ID: <b>{{ item.1 }}</b>
+	
+	{% autoescape off %}
+	
+		{{ item.0 }}
+	
+	{% endautoescape %}
+	
 {% endfor %}
