@@ -24,8 +24,15 @@ def today(request):
     cursor.close()
     return render(request, 'turin/base.html', {'list': results},)
 
+def encode_fix(string):
+    text = string.decode('utf-8')
+#     text = text.replace('\x00', '')
+    return text
+
 def getStory(request, storyid):
     connection = ODBC.DriverConnect('DSN=Dtnews')
+    connection.encoding = 'utf-8'
+    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
     cursor = connection.cursor()
     cursor.execute('''SELECT channelText, xmlTagsId 
         FROM storyElement 
