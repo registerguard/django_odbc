@@ -12,9 +12,16 @@
 		<th>Subcategory ID</th>
 		<th>SEO URL string</th>
 	</tr>
-{% for storyId, cmsStoryId, storyName, pageSetName, letter, pageNum, totalDepth, author, origin, subcategoryId, seourl in list %}
+{% for storyId, cmsStoryId, storyName, pageSetName, letter, pageNum, totalDepth, author, origin, subcategoryId, seourl, fotolist in list %}
 	<tr>
 		<td>{{ storyId }}</td><td>{{ cmsStoryId }}</td><td><a href="{{ storyId }}">{{ storyName }}</a></td><td>{{ pageSetName }}</td><td>{{ letter }}</td><td>{{ pageNum }}</td><td>{{ totalDepth }}</td><td>{{ author }}</td><td>{{ origin }}</td><td>{{ subcategoryId }}</td><td>{{ seourl }}</td>
 	</tr>
+	{% if fotolist %}
+	<tr>
+		{% for foto in fotolist %}
+			<td><img src = "/images/{{ foto }}.jpg"></td>
+		{% endfor %}
+	</tr>
+	{% endif %}
 {% endfor %}
 </table>

@@ -7,6 +7,8 @@ def today(request):
     today = datetime.date.today()
     eight_digit_date = today.strftime("%Y-%m-%d")
     connection = ODBC.DriverConnect('DSN=Dtnews')
+    connection.encoding = 'utf-8'
+    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
     cursor = connection.cursor()
     cursor.execute('''SELECT sty.storyId, cmsStory.Id, sty.storyname, api.pagesetname, api.letter, api.pagenum, totalDepth, author, origin, subcategoryid, seourl 
         FROM dbo.addbpageinfo api, dbo.storypageelements spe, dbo.story sty, dt_cms_schema.CMSStory 
@@ -21,28 +23,33 @@ def today(request):
         AND story->storyid=sty.storyid 
         GROUP BY sty.Id ORDER BY api.letter, api.pageNum,totalDepth DESC''' % eight_digit_date, '')
     results = cursor.fetchall()
-    cursor.close()
     
-    im_connection = ODBC.DriverConnect('DSN=Dtnews')
-    im_connection.encoding = 'utf-8'
-    im_connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
-    im_cursor = im_connection.cursor()
+    fancy_list = []
     for story_goods in results:
-        im_cursor.execute('''SELECT image, fhdr.fileHeaderName FROM dt_cms_schema.CMSPicture pict, dbo.ForeignDbLink dblk, dbo.FileHeader fhdr, dbo.Story stry
+        # story_goods <--> [23781556, 30235242, u'a1.fishscreen.0805', u'MAIN NEWS', u'A', 1, 4072.93335, u'Josephine Woolington', u'The Register-Guard', 19528580, u'eweb-fish-screen-dam-power']
+        cursor.execute('''SELECT image, fhdr.fileHeaderName FROM dt_cms_schema.CMSPicture pict, dbo.ForeignDbLink dblk, dbo.FileHeader fhdr, dbo.Story stry
             WHERE pict.fileheaderId = dblk.fileHeaderId 
             AND pict.fileheaderId = fhdr.fileHeaderId 
             AND dblk.foreignId = stry.storyId 
             AND pict.TheCMSPictureVersion = 16
             AND stry.storyId = %s''' % story_goods[0])
-        im_results = im_cursor.fetchall()
+        im_results = cursor.fetchall()
+        art_list = []
         for im_result in im_results:
-            if im_result[0] and not os.path.isfile('/Users/jheasly/Downloads/dtphotos/%s.jpg' % im_result[1]):
+            if im_result[0] and not os.path.isfile('/Users/jheasly/Development/django_odbc/django_odbc/turin/templates/turin/images/%s.jpg' % im_result[1]):
                 # im_result[0] binary ooze; im_result[1] filename string
-                art  = open('/Users/jheasly/Downloads/dtphotos/%s.jpg' % im_result[1], 'wb')
+                art  = open('/Users/jheasly/Development/django_odbc/django_odbc/turin/templates/turin/images/%s.jpg' % im_result[1], 'wb')
                 art.write(im_result[0])
                 art.close()
+                art_list.append(im_result[1])
+        if art_list:
+            story_goods = list(story_goods)
+            story_goods.append(art_list)
+        fancy_list.append(story_goods)
+    cursor.close()
     
-    return render(request, 'turin/base.html', {'list': results},)
+#     return render(request, 'turin/base.html', {'list': results},)
+    return render(request, 'turin/base.html', {'list': fancy_list},)
 
 def getStory(request, storyid):
     connection = ODBC.DriverConnect('DSN=Dtnews')
