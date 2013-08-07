@@ -46,10 +46,19 @@ def today(request):
             story_goods = list(story_goods)
             story_goods.append(art_list)
         fancy_list.append(story_goods)
+    
+    cursor.execute('''SELECT TOP 1 storyId, storyName, created, subCategoryId, text FROM dbo.Story WHERE Story.priorityId = (SELECT priorityId FROM dbo.Priority WHERE Priority.priorityName = '05 Bulletin') 
+        AND Story.created > {fn TIMESTAMPADD(SQL_TSI_HOUR,-6,CURRENT_DATE)}
+        GROUP BY Story.textLength  
+        ORDER BY Story.created DESC''')
+    updates_list = cursor.fetchall()
+    
+    for update_item in updates_list:
+        clean_update_item = update_item[4].split('\n')[6].split('<p/>')[1].rstrip('</text-nostyling>')
+    
     cursor.close()
     
-#     return render(request, 'turin/base.html', {'list': results},)
-    return render(request, 'turin/base.html', {'list': fancy_list},)
+    return render(request, 'turin/base.html', {'list': fancy_list, 'update': clean_update_item},)
 
 def getStory(request, storyid):
     connection = ODBC.DriverConnect('DSN=Dtnews')
@@ -68,3 +77,24 @@ def getStory(request, storyid):
     results = cursor.fetchall()
     cursor.close()
     return render(request, 'turin/story.html', {'detail_list': results},)
+
+def welchIndex(request):
+    connection = ODBC.DriverConnect('DSN=Dtnews')
+    connection.encoding = 'utf-8'
+    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
+    cursor = connection.cursor()
+    cursor.execute('''SELECT sty.storyId, storyname, api.runDate 
+        FROM dbo.AdDbPageInfo api, dbo.StoryPageElements spe, dbo.Story sty
+        WHERE api.logicalPageId = spe.logicalPagesId 
+        AND sty.storyId = spe.storyId 
+        AND sty.storyName like '%cr.welch%' 
+        GROUP BY sty.Id ORDER BY api.runDate DESC''')
+    results = cursor.fetchall()
+    out_result = []
+    for result in results:
+        result = list(result)
+        result[2] = result[2].strftime('%A, %b %d, %Y')
+        out_result.append(result)
+    cursor.close()
+#     return render(request, 'turin/columnist_index.html', {'list': results},)
+    return render(request, 'turin/columnist_index.html', {'list': out_result},)

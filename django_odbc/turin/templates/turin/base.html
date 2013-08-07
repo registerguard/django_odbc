@@ -1,3 +1,12 @@
+<html>
+<head>
+</head>
+<body>
+
+{% autoescape off %}
+	<p>{{ update }}</p>
+{% endautoescape %}
+
 <table>
 	<tr>
 		<th>Story ID</th>
@@ -25,3 +34,5 @@
 	{% endif %}
 {% endfor %}
 </table>
+</body>
+</html>
