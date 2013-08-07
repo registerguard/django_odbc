@@ -54,11 +54,12 @@ def today(request):
     updates_list = cursor.fetchall()
     
     for update_item in updates_list:
-        clean_update_item = update_item[4].split('\n')[6].split('<p/>')[1].rstrip('</text-nostyling>')
-    
+        (update_date, update_string) = update_item[2], update_item[4].split(u'\n')[6].split(u'<p/>')[1].rstrip(u'</text-nostyling>')
     cursor.close()
     
-    return render(request, 'turin/base.html', {'list': fancy_list, 'update': clean_update_item},)
+    update_date = update_date.strftime('%I:%M %p, %A, %b %d, %Y')
+    
+    return render(request, 'turin/base.html', {'list': fancy_list, 'update': (update_string, update_date),},)
 
 def getStory(request, storyid):
     connection = ODBC.DriverConnect('DSN=Dtnews')
