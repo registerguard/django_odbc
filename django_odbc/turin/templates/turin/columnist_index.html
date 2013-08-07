@@ -1,0 +1,19 @@
+<html>
+<head>
+</head>
+<body>
+
+<table>
+	<tr>
+		<th>Story ID</th>
+		<th>Story Name</th>
+		<th>Rundate</th>
+	</tr>
+{% for storyId, storyName, runDate in list %}
+	<tr>
+		<td>{{ storyId }}</td><td><a href="{{ storyId }}">{{ storyName }}</a></td><td>{{ runDate }}</td>
+	</tr>
+{% endfor %}
+</table>
+</body>
+</html>
