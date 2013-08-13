@@ -54,6 +54,7 @@ def today(request):
     updates_list = cursor.fetchall()
     
     for update_item in updates_list:
+        print updates_list
         (update_date, update_string) = update_item[2], update_item[4].split(u'\n')[6].split(u'<p/>')[1].rstrip(u'</text-nostyling>')
     cursor.close()
     
