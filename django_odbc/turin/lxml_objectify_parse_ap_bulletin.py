@@ -18,20 +18,6 @@ import mxodbc_django
 import mx.ODBC.Manager as ODBC
 from lxml import objectify, etree
 
-xml='''<?xml version="1.0" encoding="UTF-8"?>
-<?DTI version="1.0"?><DTGroup xmlns:dti="http://www.dtint.com/2006/Turin">
-  <DTStory>
-    <DTElement xmlns="http://www.dtint.com/2006/Turin" xmlns:x="adobe:ns:meta/" type_name="Headline" type="1" DTElementID="51838082" honorTypography="false">
-      <text-nostyling>AP NewsAlert</text-nostyling>
-    </DTElement>
-    <DTElement xmlns="http://www.dtint.com/2006/Turin" xmlns:x="adobe:ns:meta/" type_name="Text" type="3" DTElementID="35621175" honorTypography="true">
-      <text-nostyling>AP-US\u2014APNewsAlert,14<p/>AP NewsAlert<p/>FORT HOOD, Texas \u2014 Lawyer: Soldier accused in Fort Hood shooting rampage seems intent on receiving death sentence.</text-nostyling>
-    </DTElement>
-  </DTStory>
-</DTGroup>
-'''
-
-
 def main():
     connection = ODBC.DriverConnect('DSN=Dtnews')
     connection.encoding = 'utf-8'
@@ -66,8 +52,6 @@ def main():
 #     print 'TEXT:', text
     
     root = objectify.fromstring(text.encode('utf-8'))
-#     root = objectify.fromstring(xml)
-#     print(objectify.dump(root))
     
     try:
         for x in root.DTStory.getchildren():
@@ -78,8 +62,8 @@ def main():
     except AttributeError:
         # Log this ... 
         print 'No DTStory element found'
-    
-    print '    ', last_graf
+    if last_graf:
+        print '    ', last_graf
     print '    ', created
     
     
@@ -96,12 +80,13 @@ def main():
     
 #     cursor.execute('''UPDATE dt_z_guide.apBulletin SET updateText = '%s', createdDateTime = '%s' WHERE ID=2''' % (last_graf, created))
 #     cursor.execute('''INSERT INTO dt_z_guide.apBulletin (updateText, createdDateTime) VALUES ('WASHINGTON — US to reopen 18 of 19 embassies, consulates shuttered this week due to terrorist threat.', '2013-08-09 17:45:52.59')''')
+    
     if last_graf == current_string:
         print 'No CHANGE'
         # No change in update date, but we'll update logTimestamp
         cursor.execute('''UPDATE dt_z_guide.apBulletin SET logTimestamp = '%s' WHERE id = %s''' % (datetime.now().strftime('%c'), latest_id))
     else:
-        cursor.execute('''INSERT INTO dt_z_guide.apBulletin (updateText, createdDateTime, logTimestamp) VALUES ('%s', '%s', '%s')''' % (last_graf, created, datetime.now().strftime('%c')))
+        cursor.execute('''INSERT INTO dt_z_guide.apBulletin (updateText, createdDateTime, logTimestamp) VALUES ('%s', '%s', '%s')''' % (last_graf.decode('utf-8'), created, datetime.now().strftime('%c')))
 #     print 'After:', cursor.rowcount
     
     cursor.close()
