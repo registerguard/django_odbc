@@ -21,7 +21,7 @@ def today(request):
         AND (numLines > 1 or words > 5) 
         AND (SELECT sum(isOnLayout) FROM dbo.storyelement WHERE storyid = sty.storyId) > 0 
         AND story->storyid=sty.storyid 
-        GROUP BY sty.Id ORDER BY api.letter, api.pageNum,totalDepth DESC''' % eight_digit_date, '')
+        GROUP BY sty.Id ORDER BY api.letter, api.pageNum, totalDepth DESC''' % eight_digit_date, '')
     results = cursor.fetchall()
     
     fancy_list = []

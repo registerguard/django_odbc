@@ -51,7 +51,11 @@ def main():
 #     print 'SUBCATEGORYID:', subCategoryId
 #     print 'TEXT:', text
     
-    root = objectify.fromstring(text.encode('utf-8'))
+    try:
+        root = objectify.fromstring(text.encode('utf-8'))
+    except UnboundLocalError:
+       # Log: No text element found
+       root = ''
     
     try:
         for x in root.DTStory.getchildren():
@@ -65,7 +69,6 @@ def main():
     if last_graf:
         print '    ', last_graf
     print '    ', created
-    
     
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
@@ -89,8 +92,19 @@ def main():
         cursor.execute('''INSERT INTO dt_z_guide.apBulletin (updateText, createdDateTime, logTimestamp) VALUES ('%s', '%s', '%s')''' % (last_graf.decode('utf-8'), created, datetime.now().strftime('%c')))
 #     print 'After:', cursor.rowcount
     
-    cursor.close()
     connection.commit()
+    
+    # Clean up once a day ... 
+    if 1 == 0:
+        cursor.execute('''SELECT TOP 25 Id FROM dt_z_guide.apBulletin ORDER BY Id DESC''')
+        nested_id_list = cursor.fetchall()
+        id_list = [story_id[0] for story_id in nested_id_list]
+        id_tuple = tuple(id_list)
+        cursor.execute('''DELETE FROM dt_z_guide.apBulletin WHERE id NOT IN (%s)''' % str(id_list))
+        print cursor.rowcount
+        connection.commit()
+    
+    cursor.close()
     connection.close()
 
 if __name__ == "__main__" : main()
