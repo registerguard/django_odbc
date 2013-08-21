@@ -2,6 +2,7 @@ import datetime, os
 from django.shortcuts import render
 import mxodbc_django
 import mx.ODBC.Manager as ODBC
+from lxml import objectify, etree
 
 def today(request):
     today = datetime.date.today()
@@ -10,18 +11,18 @@ def today(request):
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
     cursor = connection.cursor()
-    cursor.execute('''SELECT sty.storyId, cmsStory.Id, sty.storyname, api.pagesetname, api.letter, api.pagenum, totalDepth, author, origin, subcategoryid, seourl 
+    cursor.execute('''SELECT sty.storyId, cmsStory.Id, sty.storyname, api.pagesetname, api.letter, MIN(api.pagenum) as firstPage, totalDepth, author, origin, subcategoryid, seourl 
         FROM dbo.addbpageinfo api, dbo.storypageelements spe, dbo.story sty, dt_cms_schema.CMSStory 
         WHERE api.logicalPageId = spe.logicalPagesId 
         AND sty.storyId = spe.storyId 
         AND subCategoryId <> 0 
         AND NOT api.code = 'TMC' 
-        AND (sty.statusId = 1018 or sty.statusId = 1019 or sty.statusId = 10) 
+        AND sty.statusId IN (10, 1018, 1019) 
         AND cast (rundate as date) = cast ('%s' as date) 
         AND (numLines > 1 or words > 5) 
         AND (SELECT sum(isOnLayout) FROM dbo.storyelement WHERE storyid = sty.storyId) > 0 
         AND story->storyid=sty.storyid 
-        GROUP BY sty.Id ORDER BY api.letter, api.pageNum, totalDepth DESC''' % eight_digit_date, '')
+        GROUP BY sty.Id ORDER BY api.letter, firstPage, totalDepth DESC''' % eight_digit_date, '')
     results = cursor.fetchall()
     
     fancy_list = []
@@ -48,17 +49,36 @@ def today(request):
         fancy_list.append(story_goods)
     
     cursor.execute('''SELECT TOP 1 storyId, storyName, created, subCategoryId, text FROM dbo.Story WHERE Story.priorityId = (SELECT priorityId FROM dbo.Priority WHERE Priority.priorityName = '05 Bulletin') 
-        AND Story.created > {fn TIMESTAMPADD(SQL_TSI_HOUR,-6,CURRENT_DATE)}
-        GROUP BY Story.textLength  
+        AND Story.created > {fn TIMESTAMPADD(SQL_TSI_HOUR,-6,CURRENT_DATE)} 
+        GROUP BY Story.textLength 
         ORDER BY Story.created DESC''')
     updates_list = cursor.fetchall()
     
-    for update_item in updates_list:
-        print updates_list
-        (update_date, update_string) = update_item[2], update_item[4].split(u'\n')[6].split(u'<p/>')[1].rstrip(u'</text-nostyling>')
+    if updates_list:
+        [storyId, storyName, created, subCategoryId, text] = updates_list[0]
+    
+    try:
+        root = objectify.fromstring(text.encode('utf-8'))
+    except UnboundLocalError:
+       # Log: No text element found
+       root = ''
+    
+    try:
+        for x in root.DTStory.getchildren():
+            if x.attrib['type_name'] == 'Text':
+                # Iterate through the paragraphs of Text element and take the last one
+                [last_graf for last_graf in x['{http://www.dtint.com/2006/Turin}text-nostyling'].itertext()]
+                update_string = last_graf.encode('utf-8')
+    except AttributeError:
+        # Log this ... 
+        print 'No DTStory element found'
+    
+#     for update_item in updates_list:
+#         print updates_list
+#         (update_date, update_string) = update_item[2], update_item[4].split(u'\n')[6].split(u'<p/>')[1].rstrip(u'</text-nostyling>')
     cursor.close()
     
-    update_date = update_date.strftime('%I:%M %p, %A, %b %d, %Y')
+    update_date = created.strftime('%I:%M %p, %A, %b %d, %Y')
     
     return render(request, 'turin/base.html', {'list': fancy_list, 'update': (update_string, update_date),},)
 
