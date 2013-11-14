@@ -1,0 +1,45 @@
+{% extends "turin/base.html" %}
+
+{% block content %}
+<div class="container">
+
+	<h3>DTI categories</h3>
+
+	<p><strong>Tip:</strong> Click on a column header to sort by that column.</p>
+
+	<table id="category_info" class="table table-condensed table-striped table-hover">
+	
+		<thead>
+		
+			<th>Category</th><th>Subcategory</th><th>Database ID</th>
+		
+		</thead>
+	
+		<tbody>
+	
+		{% for result in results %}
+			<tr>
+			
+				<td>{{ result.0 }}</td><td>{{ result.1 }}</td><td>{{ result.2 }}</td>
+			
+			</tr>
+		{% endfor %}
+	
+		</tbody>
+	
+	</table>
+	
+</div><!-- /.container -->
+{% endblock content %}
+
+{% block footer %}
+
+	{{ block.super }}
+
+	<script src="http://assets.registerguard.com/v3.5/js/jquery.tablesorter.min.js"></script>
+	<script>
+		$(function() {
+			$("table#category_info").tablesorter();
+		});
+	</script>
+{% endblock footer %}

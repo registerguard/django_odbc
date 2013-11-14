@@ -1,0 +1,21 @@
+{% extends "turin/base.html" %}
+
+{% block content %}
+	<div class="container">
+		<h1>Current date: {{ today_status }}</h1>
+		<h5>Possibly cached date: {{ today }}</h5>
+		
+		{% for result in results %}
+			<dl>
+			{% for item in result %}
+				{% if forloop.counter == 1 %}
+					<dt>{{ item }}</dt>
+				{% else %}
+					<dd>{{ item }}</dd>
+				{% endif %}
+			{% endfor %}
+			</dl>
+		{% endfor %}
+		
+	</div> <!-- /.container -->
+{% endblock content %}

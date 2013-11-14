@@ -1,39 +1,75 @@
-<html>
-<head>
-</head>
-<body>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>{% block title %}{{ title }}{% endblock %}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<!-- Locally-hosted Bootstrap -->
+		<!-- <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen"> -->
+		
+		<!-- CDN Bootstrap -->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
+		
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+			<script src="../../assets/js/html5shiv.js"></script>
+			<script src="../../assets/js/respond.min.js"></script>
+		<![endif]-->
+	</head>
+	<body>
 
-{% autoescape off %}
-	<p>{{ update.0 }}<br>
-	{{ update.1 }}</p>
-{% endautoescape %}
+	{% block content %}
 
-<table>
-	<tr>
-		<th>Story ID</th>
-		<th>CMS<br>Story ID</th>
-		<th>Story Name</th>
-		<th>Pageset Name</th>
-		<th>Section<br>Letter</th>
-		<th>Page<br>Number</th>
-		<th>Total<br>Depth</th>
-		<th>Author</th>
-		<th>Origin</th>
-		<th>Subcategory ID</th>
-		<th>SEO URL string</th>
-	</tr>
-{% for storyId, cmsStoryId, storyName, pageSetName, letter, pageNum, totalDepth, author, origin, subcategoryId, seourl, fotolist in list %}
-	<tr>
-		<td>{{ storyId }}</td><td>{{ cmsStoryId }}</td><td><a href="{{ storyId }}">{{ storyName }}</a></td><td>{{ pageSetName }}</td><td>{{ letter }}</td><td>{{ pageNum }}</td><td>{{ totalDepth }}</td><td>{{ author }}</td><td>{{ origin }}</td><td>{{ subcategoryId }}</td><td>{{ seourl }}</td>
-	</tr>
-	{% if fotolist %}
-	<tr>
-		{% for foto in fotolist %}
-			<td><img src = "/images/{{ foto }}.jpg"></td>
-		{% endfor %}
-	</tr>
-	{% endif %}
-{% endfor %}
-</table>
-</body>
+	{% autoescape off %}
+		<p>{{ update.0 }}<br>
+		{{ update.1 }}</p>
+	{% endautoescape %}
+
+	<table>
+		<tr>
+			<th>Story ID</th>
+			<th>CMS<br>Story ID</th>
+			<th>Story Name</th>
+			<th>Pageset Name</th>
+			<th>Section<br>Letter</th>
+			<th>Page<br>Number</th>
+			<th>Total<br>Depth</th>
+			<th>Author</th>
+			<th>Origin</th>
+			<th>Subcategory ID</th>
+			<th>SEO URL string</th>
+		</tr>
+	{% for storyId, cmsStoryId, storyName, pageSetName, letter, pageNum, totalDepth, author, origin, subcategoryId, seourl, fotolist in list %}
+		<tr>
+			<td>{{ storyId }}</td><td>{{ cmsStoryId }}</td><td><a href="{% url 'detail' storyId %}">{{ storyName }}</a></td><td>{{ pageSetName }}</td><td>{{ letter }}</td><td>{{ pageNum }}</td><td>{{ totalDepth }}</td><td>{{ author }}</td><td>{{ origin }}</td><td>{{ subcategoryId }}</td><td>{{ seourl }}</td>
+		</tr>
+		{% if fotolist %}
+		<tr>
+			{% for foto in fotolist %}
+				<td><img src = "/images/{{ foto }}.jpg"></td>
+			{% endfor %}
+		</tr>
+		{% endif %}
+	{% endfor %}
+	</table>
+
+	{% endblock content %}
+	
+	{% block footer %}
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="//code.jquery.com/jquery.js"></script>
+	
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	
+	<!-- CDN-hosted latest compiled and minified JavaScript -->
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<!-- Locally-hosted JavaScript-->
+	<!-- <script src="/static/js/bootstrap.min.js"></script> -->
+	{% endblock footer %}
+	
+	</body>
 </html>

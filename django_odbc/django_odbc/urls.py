@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'django_odbc.views.home', name='home'),
     # url(r'^django_odbc/', include('django_odbc.foo.urls')),
+    (r'categories/', 'turin.views.categories'),
     (r'news/', include('turin.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

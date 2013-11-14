@@ -5,8 +5,9 @@ import mx.ODBC.Manager as ODBC
 from lxml import objectify, etree
 
 def today(request):
-    today = datetime.date.today()
-    eight_digit_date = today.strftime("%Y-%m-%d")
+    my_today = datetime.date.today()
+    eight_digit_date = my_today.strftime("%Y-%m-%d")
+    
     connection = ODBC.DriverConnect('DSN=Dtnews')
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
@@ -82,23 +83,27 @@ def today(request):
     
     return render(request, 'turin/base.html', {'list': fancy_list, 'update': (update_string, update_date),},)
 
-def getStory(request, storyid):
+def getStory(request, storyid, onLayout=None):
     connection = ODBC.DriverConnect('DSN=Dtnews')
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
     cursor = connection.cursor()
-    cursor.execute('''SELECT channelText, xmlTagsId 
-        FROM storyElement 
-        WHERE storyId = %s 
-        AND isOnLayout=1 
-        AND xmltagsid IN (1, 2, 3, 4, 7, 11, 12, 13, 14, 16, 17, 18, 20, 21, 22, 23, 24, 430717) 
-        AND ((SELECT count(*) FROM storyElement WHERE storyId = %s AND isOnLayout=1 AND xmltagsid =3) = 1)''' % (storyid, storyid))
-    '''
-    results = [("Blah blah blah ... ", 34), ("Lah lah lah ... ", 45)]
-    '''
+    if onLayout == True:
+        cursor.execute('''SELECT channelText, xmlTagsId 
+            FROM storyElement 
+            WHERE storyId = %s 
+            AND isOnLayout=1 
+            AND xmltagsid IN (1, 2, 3, 4, 7, 11, 12, 13, 14, 16, 17, 18, 20, 21, 22, 23, 24, 430717) 
+            AND ((SELECT count(*) FROM storyElement WHERE storyId = %s AND isOnLayout=1 AND xmltagsid =3) = 1)''' % (storyid, storyid))
+    else:
+        cursor.execute('''SELECT channelText, xmlTagsId 
+            FROM storyElement 
+            WHERE storyId = %s 
+            AND xmltagsid IN (1, 2, 3, 4, 7, 11, 12, 13, 14, 16, 17, 18, 20, 21, 22, 23, 24, 430717) 
+            AND ((SELECT count(*) FROM storyElement WHERE storyId = %s AND xmltagsid =3) = 1)''' % (storyid, storyid))
     results = cursor.fetchall()
     cursor.close()
-    return render(request, 'turin/story.html', {'detail_list': results},)
+    return render(request, 'turin/story.html', {'detail_list': results, 'onLayout': onLayout},)
 
 def welchIndex(request):
     connection = ODBC.DriverConnect('DSN=Dtnews')
@@ -120,3 +125,103 @@ def welchIndex(request):
     cursor.close()
 #     return render(request, 'turin/columnist_index.html', {'list': results},)
     return render(request, 'turin/columnist_index.html', {'list': out_result},)
+
+def status(request):
+    '''
+    An experiment to see if this date variable caches when it's outside of a 
+    function.
+    '''
+    my_today = datetime.date.today()
+    my_today_status = datetime.date.today()
+    eight_digit_date_status = my_today_status.strftime("%Y-%m-%d")
+
+    connection = ODBC.DriverConnect('DSN=Dtnews')
+    connection.encoding = 'utf-8'
+    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
+    cursor = connection.cursor()
+#     cursor.execute('''SELECT sty.storyId, cmsStory.Id, sty.storyname, api.pagesetname, api.letter, MIN(api.pagenum) as firstPage, totalDepth, author, origin, subcategoryid, seourl 
+#     FROM dbo.addbpageinfo api, dbo.storypageelements spe, dbo.story sty, dt_cms_schema.CMSStory 
+#     WHERE api.logicalPageId = spe.logicalPagesId 
+#     AND sty.storyId = spe.storyId 
+#     AND subCategoryId <> 0 
+#     AND NOT api.code = 'TMC' 
+#     AND sty.statusId IN (10, 1018, 1019) 
+#     AND cast (rundate as date) = cast ('%s' as date) 
+#     AND (numLines > 1 or words > 5) 
+#     AND (SELECT sum(isOnLayout) FROM dbo.storyelement WHERE storyid = sty.storyId) > 0 
+#     AND story->storyid=sty.storyid 
+#     GROUP BY sty.Id ORDER BY api.letter, firstPage, totalDepth DESC''' % eight_digit_date_status, '')
+    for section in settings.DT_SECTION:
+        cursor.execute('''SELECT * from dt_cms_schema.Section WHERE publicationID = 8''')
+    
+                        '''SELECT TOP 10 mp.%Id AS Mapping
+                        FROM dt_cms_schema.Section se, dt_cms_schema.Publication pb, dt_cms_schema.PageLayout pl, dt_cms_schema.Grid gr, dt_cms_schema.Area ar, dt_cms_schema.Slot sl, dt_cms_schema.Mapping mp
+                        WHERE se.publicationID = pb.ID
+                        AND pl.publicationID = se.publicationID
+                        AND gr.pageLayoutID = pl.ID
+                        AND gr.ID = ar.gridID
+                        AND sl.areaID = ar.ID
+                        AND mp.slotReferenceID = sl.slotReferenceID
+                        AND mp.sectionID = se.%ID
+                        AND pb.name = 'rg'
+                        AND se.name = 'sports'
+                        AND pl.name = 'sports'
+                        AND gr.name = 'Default'
+                        AND ar.name = 'Stories'
+                        AND mp.version = '0'
+                        ORDER BY mp.slotReferenceID ASC'''
+                        
+    results = cursor.fetchall()
+    cursor.close()
+    return render(request, 'turin/status.html', {'results': results, 'today': my_today, 'today_status': my_today_status })
+
+def categories(request):
+    connection = ODBC.DriverConnect('DSN=Dtnews')
+    connection.encoding = 'utf-8'
+    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
+    cursor = connection.cursor()
+    cursor.execute('''SELECT categoryName, SubCategory.subCategoryName, SubCategory.subCategoryId from dbo.category, dbo.SubCategory where subcategory.categoryid= category.categoryid ORDER BY category.categoryName, SubCategory.subCategoryName''')
+    results = cursor.fetchall()
+    cursor.close()
+    return render(request, 'turin/categories.html', {'results': results })
+
+def updates(request):
+    connection = ODBC.DriverConnect('DSN=Dtnews')
+    connection.encoding = 'utf-8'
+    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
+    cursor = connection.cursor()
+    cursor.execute('''SELECT top 50 elementText, seoTitle, author, startDate, lastModTime, publishedToWebDate, unpublishedFromWebDate, storyName, story.subCategoryId, story.storyId, lastCheckedOutBy, subCategoryName, categoryName 
+        FROM dbo.Story, dt_cms_schema.CMSStory, dt_cms_schema.CMSStoryPubTracking, dbo.StoryElement, dbo.subCategory, dbo.Category 
+        WHERE dbo.story.id=cmsstory.story 
+        AND storyElement.storyId = Story.storyId 
+        AND story.priorityId=19531704 
+        AND storyElement.storyElementId = 914892 
+        AND subCategory.subCategoryId = story.subCategoryId 
+        AND subcategory.CategoryId = category.categoryId 
+        AND CMSStoryPubTracking.CMSStory = CMSStory.ID 
+        ORDER BY lastModTime DESC''')
+    results = cursor.fetchall()
+    cursor.close()
+    
+    annotated_results = []
+    for result in results:
+        labels = (
+            u'WebUpdateHeadline', 
+            u'seoTitle', 
+            u'author', 
+            u'startDate', 
+            u'lastModTime' , 
+            u'publishedToWebDate', 
+            u'unpublishedFromWebDate', 
+            u'storyName', 
+            u'subCategoryId', 
+            u'storyId', 
+            u'lastCheckedOutBy', 
+            u'subCategoryName', 
+            u'Category',
+        )
+        annotated_result = [zip(labels, result)]
+        annotated_results += annotated_result
+    
+#     return render(request, 'turin/updates.html', {'results': results })
+    return render(request, 'turin/updates.html', {'results': annotated_results })

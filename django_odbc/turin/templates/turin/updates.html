@@ -1,0 +1,40 @@
+{% extends "turin/base.html" %}
+
+{% block title %}The 50 latest updates, a proof of concept{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h2>The last 50 updates</h2>
+	
+	<p><b>Note:</b> This list currently sorted by <code>lastModTime</code> descending. I think the current updates use <code>publishedToWebDate</code> as <code>lastModTime</code> gets weird when things hit the print workflow.</p>
+	
+	<table class="table">
+	{% for result in results %}
+		{% for item in result %}
+			{% if forloop.counter == 1 %}
+				<tr><th colspan="2"><b class="text-danger">{% if result.11.1 != '-' %}{{ result.11.1 }}{% else %}{{ result.12.1 }}{% endif %}:</b> <a href="{% url 'detail_no_layout' result.9.1 %}">{{ item.1|safe }}</a></th></tr>
+			{% else %}
+				<tr><td class="text-right"><strong>{{ item.0 }}:</strong></td><td> {{ item.1 }}</td></tr>
+			{% endif %}
+		{% endfor %}
+	{% endfor %}
+	</table>
+	
+	{% comment %}
+	<!-- COMMENTED OUT! -->
+	{% for result in results %}
+		<dl>
+		{% for item in result %}
+			{% if forloop.counter == 1 %}
+				<dt><b style="color: red;">{% if result.11.1 != '-' %}{{ result.11.1 }}{% else %}{{ result.12.1 }}{% endif %}:</b> <a href="{% url 'detail_no_layout' result.9.1 %}">{{ item.1|safe }}</a></dt>
+			{% else %}
+				<dd><b>{{ item.0 }}:</b> {{ item.1 }}</dd>
+			{% endif %}
+		{% endfor %}
+		</dl>
+	{% endfor %}
+	<!-- /COMMENTED OUT! -->
+	{% endcomment %}
+	
+</div> <!-- /.container -->
+{% endblock content %}

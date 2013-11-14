@@ -53,10 +53,12 @@ def main():
     
     try:
         root = objectify.fromstring(text.encode('utf-8'))
-    except UnboundLocalError:
+    except (UnboundLocalError, AttributeError):
        # Log: No text element found
        root = ''
     
+    last_graf = u''
+    created = u''
     try:
         for x in root.DTStory.getchildren():
             if x.attrib['type_name'] == 'Text':
@@ -68,7 +70,8 @@ def main():
         print 'No DTStory element found'
     if last_graf:
         print '    ', last_graf
-    print '    ', created
+    if created:
+        print '    ', created
     
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
@@ -84,7 +87,7 @@ def main():
 #     cursor.execute('''UPDATE dt_z_guide.apBulletin SET updateText = '%s', createdDateTime = '%s' WHERE ID=2''' % (last_graf, created))
 #     cursor.execute('''INSERT INTO dt_z_guide.apBulletin (updateText, createdDateTime) VALUES ('WASHINGTON — US to reopen 18 of 19 embassies, consulates shuttered this week due to terrorist threat.', '2013-08-09 17:45:52.59')''')
     
-    if last_graf == current_string:
+    if (last_graf and current_string) and last_graf == current_string:
         print 'No CHANGE'
         # No change in update date, but we'll update logTimestamp
         cursor.execute('''UPDATE dt_z_guide.apBulletin SET logTimestamp = '%s' WHERE id = %s''' % (datetime.now().strftime('%c'), latest_id))
