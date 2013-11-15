@@ -2,3 +2,5 @@
 .DS_Store
 django_odbc/django_odbc/settings_local.py
 django_odbc/turin/templates/turin/images/
+django_odbc/django_odbc/egenix*
+django_odbc/django_odbc/mxodbc_django*
