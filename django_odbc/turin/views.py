@@ -1,4 +1,6 @@
 import datetime, os
+from django.conf import settings
+from django.http import HttpResponse
 from django.shortcuts import render
 import mxodbc_django
 import mx.ODBC.Manager as ODBC
@@ -139,41 +141,50 @@ def status(request):
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
     cursor = connection.cursor()
-#     cursor.execute('''SELECT sty.storyId, cmsStory.Id, sty.storyname, api.pagesetname, api.letter, MIN(api.pagenum) as firstPage, totalDepth, author, origin, subcategoryid, seourl 
-#     FROM dbo.addbpageinfo api, dbo.storypageelements spe, dbo.story sty, dt_cms_schema.CMSStory 
-#     WHERE api.logicalPageId = spe.logicalPagesId 
-#     AND sty.storyId = spe.storyId 
-#     AND subCategoryId <> 0 
-#     AND NOT api.code = 'TMC' 
-#     AND sty.statusId IN (10, 1018, 1019) 
-#     AND cast (rundate as date) = cast ('%s' as date) 
-#     AND (numLines > 1 or words > 5) 
-#     AND (SELECT sum(isOnLayout) FROM dbo.storyelement WHERE storyid = sty.storyId) > 0 
-#     AND story->storyid=sty.storyid 
-#     GROUP BY sty.Id ORDER BY api.letter, firstPage, totalDepth DESC''' % eight_digit_date_status, '')
-    for section in settings.DT_SECTION:
-        cursor.execute('''SELECT * from dt_cms_schema.Section WHERE publicationID = 8''')
     
-                        '''SELECT TOP 10 mp.%Id AS Mapping
-                        FROM dt_cms_schema.Section se, dt_cms_schema.Publication pb, dt_cms_schema.PageLayout pl, dt_cms_schema.Grid gr, dt_cms_schema.Area ar, dt_cms_schema.Slot sl, dt_cms_schema.Mapping mp
-                        WHERE se.publicationID = pb.ID
-                        AND pl.publicationID = se.publicationID
-                        AND gr.pageLayoutID = pl.ID
-                        AND gr.ID = ar.gridID
-                        AND sl.areaID = ar.ID
-                        AND mp.slotReferenceID = sl.slotReferenceID
-                        AND mp.sectionID = se.%ID
-                        AND pb.name = 'rg'
-                        AND se.name = 'sports'
-                        AND pl.name = 'sports'
-                        AND gr.name = 'Default'
-                        AND ar.name = 'Stories'
-                        AND mp.version = '0'
-                        ORDER BY mp.slotReferenceID ASC'''
-                        
+#     for section in settings.DT_SECTIONS:
+    import mimetypes
+    cursor.execute('''SELECT 
+                        dbo.fileheader.nativeThumbnail 
+                    FROM 
+                        dbo.story, 
+                        dbo.fileheader, 
+                        dbo.foreigndblink 
+                    WHERE 
+                        dbo.fileheader.fileheaderid = dbo.ForeignDbLink.fileheaderid 
+                    AND 
+                        dbo.story.storyid = dbo.foreigndblink.foreignid 
+                    AND 
+                        dbo.story.storyid IN (25009536) 
+                    ORDER BY 
+                        dbo.story.storyname''')
+    
     results = cursor.fetchall()
     cursor.close()
-    return render(request, 'turin/status.html', {'results': results, 'today': my_today, 'today_status': my_today_status })
+    response = HttpResponse(results[0][0], mimetype='image/jpeg')
+    return response
+    
+#     cursor.execute('''SELECT 
+#                         dbo.story.storyname, 
+#                         dbo.fileheader.fileheadername, 
+#                         dbo.fileheader.nativeThumbnail, 
+#                         dbo.fileheader.caption
+#                     FROM 
+#                         dbo.story, 
+#                         dbo.fileheader, 
+#                         dbo.foreigndblink 
+#                     WHERE 
+#                         dbo.fileheader.fileheaderid = dbo.ForeignDbLink.fileheaderid 
+#                     AND 
+#                         dbo.story.storyid = dbo.foreigndblink.foreignid 
+#                     AND 
+#                         dbo.story.storyid IN (25009536) 
+#                     ORDER BY 
+#                         dbo.story.storyname''')
+#     
+#     results = cursor.fetchall()
+#     cursor.close()
+#     return render(request, 'turin/status.html', {'results': results, 'today': my_today, 'today_status': my_today_status })
 
 def categories(request):
     connection = ODBC.DriverConnect('DSN=Dtnews')
