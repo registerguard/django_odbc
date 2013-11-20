@@ -102,7 +102,7 @@ def getStory(request, storyid, onLayout=None):
             FROM storyElement 
             WHERE storyId = %s 
             AND xmltagsid IN (1, 2, 3, 4, 7, 11, 12, 13, 14, 16, 17, 18, 20, 21, 22, 23, 24, 430717) 
-            AND ((SELECT count(*) FROM storyElement WHERE storyId = %s AND xmltagsid =3) = 1)''' % (storyid, storyid))
+            AND ((SELECT count(*) FROM storyElement WHERE storyId = %s AND xmltagsid = 3) = 1)''' % (storyid, storyid))
     results = cursor.fetchall()
     cursor.close()
     return render(request, 'turin/story.html', {'detail_list': results, 'onLayout': onLayout},)
@@ -143,7 +143,6 @@ def status(request):
     cursor = connection.cursor()
     
 #     for section in settings.DT_SECTIONS:
-    import mimetypes
     cursor.execute('''SELECT 
                         dbo.fileheader.nativeThumbnail 
                     FROM 
@@ -236,3 +235,23 @@ def updates(request):
     
 #     return render(request, 'turin/updates.html', {'results': results })
     return render(request, 'turin/updates.html', {'results': annotated_results })
+
+def thumbnail(request, imageid):
+    connection = ODBC.DriverConnect('DSN=Dtnews')
+    connection.encoding = 'utf-8'
+    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
+    cursor = connection.cursor()
+    
+    cursor.execute('''SELECT 
+                        dbo.fileheader.Thumbnail 
+                    FROM 
+                        dbo.fileheader 
+                    WHERE 
+                        width > 0.0 
+                    AND 
+                        fileheaderId IN (%s)''' % imageid)
+    
+    results = cursor.fetchall()
+    cursor.close()
+    response = HttpResponse(results[0][0], mimetype='image/jpeg')
+    return response

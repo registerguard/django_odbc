@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     url(r'^(?P<storyid>\d{8})/$', views.getStory, {'onLayout': True}, name='detail'),
     url(r'^status/$', views.status, name='status'),
     url(r'^updates/$', views.updates, name='updates'),
+    url(r'^thumbnail/(?P<imageid>\d+)/$', views.thumbnail, name='image'),
 )
