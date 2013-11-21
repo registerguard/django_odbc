@@ -167,7 +167,7 @@ def status(request):
     
     cursor.execute('''SELECT 
                         dbo.story.storyname, 
-                        dbo.priority.priorityName, 
+                        dbo.fileheader.priorityId, 
                         cmspicture.id,  
                         dbo.fileheader.fileheadername, 
                         dbo.fileheader.caption 
@@ -194,7 +194,16 @@ def status(request):
     
     results = cursor.fetchall()
     cursor.close()
-    return render(request, 'turin/status.html', {'results': results, 'today': my_today, 'today_status': my_today_status, 'title': u'Status check page', 'story_id_list': story_id_list })
+    
+    return render(request, 'turin/status.html', 
+        {
+            'results': results, 
+            'today': my_today, 
+            'today_status': my_today_status, 
+            'title': u'DTI Status page (linter)', 
+            'story_id_list': story_id_list, 
+            'settings': settings.DT_MEDIA_STATUS, 
+        })
 
 def categories(request):
     connection = ODBC.DriverConnect('DSN=Dtnews')

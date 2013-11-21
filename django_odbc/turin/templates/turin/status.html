@@ -5,25 +5,38 @@
 		<h1>Current date: {{ today_status }}</h1>
 		<h5>(Possibly cached date: {{ today }})</h5>
 		
+		<table class="table table-condensed table-responsive">
 		{% for result in results %}
-			<dl>
-				<dt>DTI story file: {{ result.0 }}</dt>
-				<dd><b>Story Priority:</b> {{ result.1 }}</dd>
-				<dd><img src="http://registerguard.com/csp/cms/sites/custom.rg.img.cls?id={{ result.2 }}"></dd>
-				<dd><b>DTI image file:</b> {{ result.3 }}</dd>
-				<dd><b>Caption:</b> {{ result.4 }}</dd>
-			</dl>
+			<tr class="active">
+				<th>DTI story file:</th><th>{{ result.0 }}</th>
+			</tr>
+			<tr>
+				<td rowspan="3"><img src="http://registerguard.com/csp/cms/sites/custom.rg.img.cls?id={{ result.2 }}"></td>
+				<td><b>DTI image file:</b> {{ result.3 }}</td>
+			</tr>
+			<tr>
+				<td><b>Caption:</b> {{ result.4 }}</td>
+			</tr>
+			<tr>
+				{% with img_pri=result.1 %}
+					{% for setting in settings %}
+						{% if img_pri = setting.0 %}
+							<td><b>Image Priority:</b> {{ setting.1 }}</td>
+						{% endif %}
+					{% endfor %}
+				{% endwith %}
+			</tr>
 			
 			<hr>
 			
 		{% endfor %}
+		</table>
+		
+		<hr>
 		
 		Raw result: {{ results }}<br>
-		Story ID list: {{ story_id_list }}
-		<hr>
-		{% for id in story_id_list %}
-			{{ id.0 }}<br>
-		{% endfor %}
+		Story ID list: {{ story_id_list }}<br>
+		Settings: {{ settings }}<br>
 		
 	</div> <!-- /.container -->
 {% endblock content %}
