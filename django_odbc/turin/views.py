@@ -143,47 +143,58 @@ def status(request):
     cursor = connection.cursor()
     
 #     for section in settings.DT_SECTIONS:
+    
+    cursor.execute('''SELECT st.storyId 
+    FROM dt_cms_schema.Section se, dt_cms_schema.Publication pb, dt_cms_schema.PageLayout pl, dt_cms_schema.Grid gr, dt_cms_schema.Area ar, dt_cms_schema.Slot sl, dt_cms_schema.Mapping mp, dt_cms_schema.CMSStory cm, dbo.Story st 
+    WHERE se.publicationID = pb.ID
+    AND pl.publicationID = se.publicationID
+    AND gr.pageLayoutID = pl.ID
+    AND gr.ID = ar.gridID
+    AND sl.areaID = ar.ID
+    AND mp.slotReferenceID = sl.slotReferenceID
+    AND mp.sectionID = se.%ID 
+    AND cm.ID = mp.cmsStory 
+    AND cm.story = st.ID
+    AND pb.name = 'rg'
+    AND se.name = 'local'
+    AND pl.name = 'local'
+    AND gr.name = 'Default'
+    AND ar.name = 'Top Stories'
+    AND mp.version = '0'
+    ORDER BY mp.slotReferenceID ASC''')
+    story_id_list = cursor.fetchall()
+    story_id_tuple = tuple(story_id[0] for story_id in story_id_list)
+    
     cursor.execute('''SELECT 
-                        dbo.fileheader.nativeThumbnail 
+                        dbo.story.storyname, 
+                        dbo.priority.priorityName, 
+                        cmspicture.id,  
+                        dbo.fileheader.fileheadername, 
+                        dbo.fileheader.caption 
                     FROM 
                         dbo.story, 
                         dbo.fileheader, 
-                        dbo.foreigndblink 
+                        dbo.foreigndblink, 
+                        dt_cms_schema.CMSPicture, 
+                        dbo.Priority 
                     WHERE 
                         dbo.fileheader.fileheaderid = dbo.ForeignDbLink.fileheaderid 
                     AND 
                         dbo.story.storyid = dbo.foreigndblink.foreignid 
                     AND 
-                        dbo.story.storyid IN (25009536) 
+                        foreignDblink.fileheaderid = cmspicture.fileheaderId  
+                    AND 
+                        CMSPicture.TheCMSPictureVersion = 18 
+                    AND 
+                        Priority.priorityId = story.priorityId
+                    AND 
+                        dbo.story.storyid IN %s 
                     ORDER BY 
-                        dbo.story.storyname''')
+                        dbo.story.storyname''' % str(story_id_tuple) )
     
     results = cursor.fetchall()
     cursor.close()
-    response = HttpResponse(results[0][0], mimetype='image/jpeg')
-    return response
-    
-#     cursor.execute('''SELECT 
-#                         dbo.story.storyname, 
-#                         dbo.fileheader.fileheadername, 
-#                         dbo.fileheader.nativeThumbnail, 
-#                         dbo.fileheader.caption
-#                     FROM 
-#                         dbo.story, 
-#                         dbo.fileheader, 
-#                         dbo.foreigndblink 
-#                     WHERE 
-#                         dbo.fileheader.fileheaderid = dbo.ForeignDbLink.fileheaderid 
-#                     AND 
-#                         dbo.story.storyid = dbo.foreigndblink.foreignid 
-#                     AND 
-#                         dbo.story.storyid IN (25009536) 
-#                     ORDER BY 
-#                         dbo.story.storyname''')
-#     
-#     results = cursor.fetchall()
-#     cursor.close()
-#     return render(request, 'turin/status.html', {'results': results, 'today': my_today, 'today_status': my_today_status })
+    return render(request, 'turin/status.html', {'results': results, 'today': my_today, 'today_status': my_today_status, 'title': u'Status check page', 'story_id_list': story_id_list })
 
 def categories(request):
     connection = ODBC.DriverConnect('DSN=Dtnews')

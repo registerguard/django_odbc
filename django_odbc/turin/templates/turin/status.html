@@ -3,20 +3,26 @@
 {% block content %}
 	<div class="container">
 		<h1>Current date: {{ today_status }}</h1>
-		<h5>Possibly cached date: {{ today }}</h5>
-		
-		Raw result: {{ results }}
+		<h5>(Possibly cached date: {{ today }})</h5>
 		
 		{% for result in results %}
 			<dl>
-			{% for item in result %}
-				{% if forloop.counter == 1 %}
-					<dt>{{ item }}</dt>
-				{% else %}
-					<dd>{{ item }}</dd>
-				{% endif %}
-			{% endfor %}
+				<dt>DTI story file: {{ result.0 }}</dt>
+				<dd><b>Story Priority:</b> {{ result.1 }}</dd>
+				<dd><img src="http://registerguard.com/csp/cms/sites/custom.rg.img.cls?id={{ result.2 }}"></dd>
+				<dd><b>DTI image file:</b> {{ result.3 }}</dd>
+				<dd><b>Caption:</b> {{ result.4 }}</dd>
 			</dl>
+			
+			<hr>
+			
+		{% endfor %}
+		
+		Raw result: {{ results }}<br>
+		Story ID list: {{ story_id_list }}
+		<hr>
+		{% for id in story_id_list %}
+			{{ id.0 }}<br>
 		{% endfor %}
 		
 	</div> <!-- /.container -->
