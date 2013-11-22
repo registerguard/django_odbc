@@ -7,9 +7,11 @@
 		
 		<table class="table table-condensed table-responsive">
 		{% for result in results %}
+			{% ifchanged %}
 			<tr class="active">
 				<th>DTI story file:</th><th>{{ result.story_slug }}</th>
 			</tr>
+			{% endifchanged %}
 			<tr>
 				<td rowspan="3"><img src="http://registerguard.com/csp/cms/sites/custom.rg.img.cls?id={{ result.cms_picture_id }}"></td>
 				<td><b>DTI image file:</b> {{ result.image_slug }}</td>
@@ -20,7 +22,6 @@
 			<tr>
 				<td><b>Image Priority:</b> {{ result.image_priority_id }}</td>
 			</tr>
-			
 		{% endfor %}
 		</table>
 		
