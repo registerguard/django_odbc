@@ -19,7 +19,7 @@
 			<tr>
 				<td><b>Caption:</b> {{ result.caption }}</td>
 			</tr>
-			<tr>
+			<tr{% if result.image_priority_id = '-' %} class="warning"{% endif %}>
 				<td><b>Image Priority:</b> {{ result.image_priority_id }}</td>
 			</tr>
 		{% endfor %}
@@ -30,6 +30,7 @@
 		<strong>Raw result</strong>: {{ results }}<br>
 		<strong>Story ID list</strong>: {{ story_id_list }}<br>
 		<strong>DT_MEDIA_STATUS Settings</strong>: {{ settings }}<br>
+		<strong>results_dict_a</strong>: {{ results_dict_a }}<br>
 		
 	</div> <!-- /.container -->
 {% endblock content %}

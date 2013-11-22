@@ -159,9 +159,9 @@ def status(request):
     AND se.name = 'local'
     AND pl.name = 'local'
     AND gr.name = 'Default'
-    AND ar.name = 'Top Stories'
+    AND ar.name in ('Top Stories', 'Stories')
     AND mp.version = '0'
-    ORDER BY mp.slotReferenceID ASC''')
+    ORDER BY ar.name DESC, mp.slotReferenceID ASC''')
     story_id_list = cursor.fetchall()
     story_id_tuple = tuple(story_id[0] for story_id in story_id_list)
     
@@ -207,22 +207,26 @@ def status(request):
     '''
     Convert database result list of keyless tuples to keyed dictionary
     '''
-    results = [ dict( zip(('story_slug', 'image_priority_id', 'cms_picture_id', 'image_slug', 'caption'), result_item) ) for result_item in results ]
+    #
+    # This is dict/zip-ping is messing with the order!
+    #
+    results_dict = [ dict( zip(('story_slug', 'image_priority_id', 'cms_picture_id', 'image_slug', 'caption'), result_item) ) for result_item in results ]
     
     '''
     Lookup Priority; translate from ID to string/label
     '''
-    for result in results:
+    for result in results_dict:
          result['image_priority_id'] = settings.DT_MEDIA_STATUS[result['image_priority_id']]
     
     return render(request, 'turin/status.html', 
         {
-            'results': results, 
+            'results': results_dict, 
             'today': my_today, 
             'today_status': my_today_status, 
             'title': u'DTI Status page (linter)', 
             'story_id_list': story_id_list, 
             'settings': settings.DT_MEDIA_STATUS, 
+            'results_dict_a': results_dict_a,
         })
 
 def categories(request):
