@@ -190,7 +190,16 @@ def status(request):
                     AND 
                         dbo.story.storyid IN %s 
                     ORDER BY 
-                        dbo.story.storyname''' % str(story_id_tuple) )
+                        dbo.story.storyname, CASE fileheader.priorityId 
+                                WHEN 0 THEN 1 
+                                WHEN 4 THEN 2 
+                                WHEN 5 THEN 3 
+                                WHEN 2 THEN 4 
+                                WHEN 3 THEN 5 
+                                WHEN 8 THEN 6
+                                WHEN 6 THEN 7
+                                WHEN 7 THEN 8
+                               END''' % str(story_id_tuple) )
     
     results = cursor.fetchall()
     cursor.close()
