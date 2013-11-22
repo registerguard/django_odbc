@@ -195,6 +195,17 @@ def status(request):
     results = cursor.fetchall()
     cursor.close()
     
+    '''
+    Convert database result list of keyless tuples to keyed dictionary
+    '''
+    results = [ dict( zip(('story_slug', 'image_priority_id', 'cms_picture_id', 'image_slug', 'caption'), result_item) ) for result_item in results ]
+    
+    '''
+    Lookup Priority; translate from ID to string/label
+    '''
+    for result in results:
+         result['image_priority_id'] = settings.DT_MEDIA_STATUS[result['image_priority_id']]
+    
     return render(request, 'turin/status.html', 
         {
             'results': results, 

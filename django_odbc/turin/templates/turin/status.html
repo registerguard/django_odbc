@@ -8,23 +8,17 @@
 		<table class="table table-condensed table-responsive">
 		{% for result in results %}
 			<tr class="active">
-				<th>DTI story file:</th><th>{{ result.0 }}</th>
+				<th>DTI story file:</th><th>{{ result.story_slug }}</th>
 			</tr>
 			<tr>
-				<td rowspan="3"><img src="http://registerguard.com/csp/cms/sites/custom.rg.img.cls?id={{ result.2 }}"></td>
-				<td><b>DTI image file:</b> {{ result.3 }}</td>
+				<td rowspan="3"><img src="http://registerguard.com/csp/cms/sites/custom.rg.img.cls?id={{ result.cms_picture_id }}"></td>
+				<td><b>DTI image file:</b> {{ result.image_slug }}</td>
 			</tr>
 			<tr>
-				<td><b>Caption:</b> {{ result.4 }}</td>
+				<td><b>Caption:</b> {{ result.caption }}</td>
 			</tr>
 			<tr>
-				{% with img_pri=result.1 %}
-					{% for setting in settings %}
-						{% if img_pri = setting.0 %}
-							<td><b>Image Priority:</b> {{ setting.1 }}</td>
-						{% endif %}
-					{% endfor %}
-				{% endwith %}
+				<td><b>Image Priority:</b> {{ result.image_priority_id }}</td>
 			</tr>
 			
 			<hr>
@@ -34,9 +28,9 @@
 		
 		<hr>
 		
-		Raw result: {{ results }}<br>
-		Story ID list: {{ story_id_list }}<br>
-		Settings: {{ settings }}<br>
+		<strong>Raw result</strong>: {{ results }}<br>
+		<strong>Story ID list</strong>: {{ story_id_list }}<br>
+		<strong>Settings</strong>: {{ settings }}<br>
 		
 	</div> <!-- /.container -->
 {% endblock content %}

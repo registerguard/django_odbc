@@ -20,21 +20,5 @@
 	{% endfor %}
 	</table>
 	
-	{% comment %}
-	<!-- COMMENTED OUT! -->
-	{% for result in results %}
-		<dl>
-		{% for item in result %}
-			{% if forloop.counter == 1 %}
-				<dt><b style="color: red;">{% if result.11.1 != '-' %}{{ result.11.1 }}{% else %}{{ result.12.1 }}{% endif %}:</b> <a href="{% url 'detail_no_layout' result.9.1 %}">{{ item.1|safe }}</a></dt>
-			{% else %}
-				<dd><b>{{ item.0 }}:</b> {{ item.1 }}</dd>
-			{% endif %}
-		{% endfor %}
-		</dl>
-	{% endfor %}
-	<!-- /COMMENTED OUT! -->
-	{% endcomment %}
-	
 </div> <!-- /.container -->
 {% endblock content %}
