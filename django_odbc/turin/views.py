@@ -1,3 +1,4 @@
+import collections
 import datetime, os
 from django.conf import settings
 from django.http import HttpResponse
@@ -136,7 +137,7 @@ def status(request):
     my_today = datetime.date.today()
     my_today_status = datetime.date.today()
     eight_digit_date_status = my_today_status.strftime("%Y-%m-%d")
-
+    
     connection = ODBC.DriverConnect('DSN=Dtnews')
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
@@ -144,7 +145,7 @@ def status(request):
     
 #     for section in settings.DT_SECTIONS:
     
-    cursor.execute('''SELECT st.storyId 
+    cursor.execute('''SELECT st.storyId, st.storyName 
     FROM dt_cms_schema.Section se, dt_cms_schema.Publication pb, dt_cms_schema.PageLayout pl, dt_cms_schema.Grid gr, dt_cms_schema.Area ar, dt_cms_schema.Slot sl, dt_cms_schema.Mapping mp, dt_cms_schema.CMSStory cm, dbo.Story st 
     WHERE se.publicationID = pb.ID
     AND pl.publicationID = se.publicationID
@@ -161,22 +162,27 @@ def status(request):
     AND gr.name = 'Default'
     AND ar.name in ('Top Stories', 'Stories')
     AND mp.version = '0'
-    ORDER BY ar.name DESC, mp.slotReferenceID ASC''')
+    ORDER BY sl.areaID, mp.slotReferenceID''')
     story_id_list = cursor.fetchall()
     story_id_tuple = tuple(story_id[0] for story_id in story_id_list)
     
     cursor.execute('''SELECT 
                         dbo.story.storyname, 
                         dbo.fileheader.priorityId, 
-                        cmspicture.id,  
+                        cmspicture.id, 
                         dbo.fileheader.fileheadername, 
-                        dbo.fileheader.caption 
+                        dbo.fileheader.caption, 
+                        slot.areaID, 
+                        mapping.slotReferenceID 
                     FROM 
                         dbo.story, 
                         dbo.fileheader, 
                         dbo.foreigndblink, 
                         dt_cms_schema.CMSPicture, 
-                        dbo.Priority 
+                        dbo.Priority, 
+                        dt_cms_schema.CMSStory, 
+                        dt_cms_schema.Slot, 
+                        dt_cms_schema.Mapping 
                     WHERE 
                         dbo.fileheader.fileheaderid = dbo.ForeignDbLink.fileheaderid 
                     AND 
@@ -186,11 +192,19 @@ def status(request):
                     AND 
                         CMSPicture.TheCMSPictureVersion = 18 
                     AND 
-                        Priority.priorityId = story.priorityId
+                        Priority.priorityId = story.priorityId 
+                    AND 
+                        CMSStory.story = Story.ID 
+                    AND 
+                        mapping.CMSStory = CMSStory.ID 
+                    AND 
+                        mapping.slotReferenceID = slot.slotReferenceID 
                     AND 
                         dbo.story.storyid IN %s 
+                    AND 
+                       areaID in (354, 355) 
                     ORDER BY 
-                        dbo.story.storyname, CASE fileheader.priorityId 
+                        slot.areaID, mapping.slotReferenceID, CASE fileheader.priorityId 
                                 WHEN 0 THEN 1 
                                 WHEN 4 THEN 2 
                                 WHEN 5 THEN 3 
@@ -204,16 +218,19 @@ def status(request):
     results = cursor.fetchall()
     cursor.close()
     
+    early_results = results
+    
     '''
     Convert database result list of keyless tuples to keyed dictionary
     '''
     #
     # This is dict/zip-ping is messing with the order!
     #
-    results_dict = [ dict( zip(('story_slug', 'image_priority_id', 'cms_picture_id', 'image_slug', 'caption'), result_item) ) for result_item in results ]
+#     results_dict = [ dict( zip(('story_slug', 'image_priority_id', 'cms_picture_id', 'image_slug', 'caption'), result_item) ) for result_item in results ]
+    results_dict = [ collections.OrderedDict( zip(('story_slug', 'image_priority_id', 'cms_picture_id', 'image_slug', 'caption'), result_item) ) for result_item in results ]
     
     '''
-    Lookup Priority; translate from ID to string/label
+    Look up Priority; translate from ID to string/label
     '''
     for result in results_dict:
          result['image_priority_id'] = settings.DT_MEDIA_STATUS[result['image_priority_id']]
@@ -226,7 +243,7 @@ def status(request):
             'title': u'DTI Status page (linter)', 
             'story_id_list': story_id_list, 
             'settings': settings.DT_MEDIA_STATUS, 
-            'results_dict_a': results_dict_a,
+            'early_results': early_results,
         })
 
 def categories(request):
