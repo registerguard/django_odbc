@@ -23,40 +23,42 @@
 	<body>
 
 	{% block content %}
+	<div class="container">
+		
+		{% autoescape off %}
+			<p>{{ update.0 }}<br>
+			{{ update.1 }}</p>
+		{% endautoescape %}
 
-	{% autoescape off %}
-		<p>{{ update.0 }}<br>
-		{{ update.1 }}</p>
-	{% endautoescape %}
-
-	<table>
-		<tr>
-			<th>Story ID</th>
-			<th>CMS<br>Story ID</th>
-			<th>Story Name</th>
-			<th>Pageset Name</th>
-			<th>Section<br>Letter</th>
-			<th>Page<br>Number</th>
-			<th>Total<br>Depth</th>
-			<th>Author</th>
-			<th>Origin</th>
-			<th>Subcategory ID</th>
-			<th>SEO URL string</th>
-		</tr>
-	{% for storyId, cmsStoryId, storyName, pageSetName, letter, pageNum, totalDepth, author, origin, subcategoryId, seourl, fotolist in list %}
-		<tr>
-			<td>{{ storyId }}</td><td>{{ cmsStoryId }}</td><td><a href="{% url 'detail' storyId %}">{{ storyName }}</a></td><td>{{ pageSetName }}</td><td>{{ letter }}</td><td>{{ pageNum }}</td><td>{{ totalDepth }}</td><td>{{ author }}</td><td>{{ origin }}</td><td>{{ subcategoryId }}</td><td>{{ seourl }}</td>
-		</tr>
-		{% if fotolist %}
-		<tr>
-			{% for foto in fotolist %}
-				<td><img src = "/images/{{ foto }}.jpg"></td>
-			{% endfor %}
-		</tr>
-		{% endif %}
-	{% endfor %}
-	</table>
-
+		<table class="table table-condensed table-striped table-hover">
+			<tr>
+				<th>Story ID</th>
+				<th>CMS<br>Story ID</th>
+				<th>Story Name</th>
+				<th>Pageset Name</th>
+				<th>Section<br>Letter</th>
+				<th>Page<br>Number</th>
+				<th>Total<br>Depth</th>
+				<th>Author</th>
+				<th>Origin</th>
+				<th>Subcategory ID</th>
+				<th>SEO URL string</th>
+			</tr>
+		{% for storyId, cmsStoryId, storyName, pageSetName, letter, pageNum, totalDepth, author, origin, subcategoryId, seourl, fotolist in list %}
+			<tr>
+				<td>{{ storyId }}</td><td>{{ cmsStoryId }}</td><td><a href="{% url 'detail' storyId %}">{{ storyName }}</a></td><td>{{ pageSetName }}</td><td>{{ letter }}</td><td>{{ pageNum }}</td><td>{{ totalDepth }}</td><td>{{ author }}</td><td>{{ origin }}</td><td>{{ subcategoryId }}</td><td>{{ seourl }}</td>
+			</tr>
+			{% if fotolist %}
+			<tr>
+				{% for foto in fotolist %}
+					<td><img src = "/images/{{ foto }}.jpg"></td>
+				{% endfor %}
+			</tr>
+			{% endif %}
+		{% endfor %}
+		</table>
+		
+	</div> <!-- /.container -->
 	{% endblock content %}
 	
 	{% block footer %}
