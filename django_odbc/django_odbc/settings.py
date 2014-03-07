@@ -11,7 +11,6 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-#         'ENGINE': 'mxodbc_django.ms_sql_server', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'ENGINE': 'django.db.backends.dummy', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'CMS',                           # Or path to database file if using sqlite3.
         'DSN': 'DSN=Dtnews',
