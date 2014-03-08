@@ -1,6 +1,9 @@
 import collections
 import datetime, os
 from django.conf import settings
+# from django.core.exceptions import ViewDoesNotExist
+# from django.core.urlresolvers import get_resolver, RegexURLPattern, RegexURLResolver
+from django.core import urlresolvers
 from django.http import HttpResponse
 from django.shortcuts import render
 import mxodbc_django
@@ -316,3 +319,25 @@ def thumbnail(request, imageid):
     cursor.close()
     response = HttpResponse(results[0][0], mimetype='image/jpeg')
     return response
+
+intro_text = """View name         URL
+========================================
+"""
+
+def show_url_patterns(request):
+    # https://djangosnippets.org/snippets/1434/
+    patterns = _get_named_patterns()
+    r = HttpResponse(intro_text, content_type='text/plain')
+    longest = max([len(pair[0]) for pair in patterns])
+    for key, value in patterns:
+        r.write('%s /%s\n' % (key.ljust(longest + 1), value))
+    return r
+    
+def _get_named_patterns():
+    resolver = urlresolvers.get_resolver(None)
+    patterns = sorted([
+        (key, value[0][0][0])
+        for key, value in resolver.reverse_dict.items()
+        if isinstance(key, basestring)
+    ])
+    return patterns
