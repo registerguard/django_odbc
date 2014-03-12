@@ -320,17 +320,18 @@ def thumbnail(request, imageid):
     response = HttpResponse(results[0][0], mimetype='image/jpeg')
     return response
 
-intro_text = """View name         URL
-========================================
+intro_text = """<pre>View name         URL<br>
+========================================<br>
 """
 
 def show_url_patterns(request):
     # https://djangosnippets.org/snippets/1434/
     patterns = _get_named_patterns()
-    r = HttpResponse(intro_text, content_type='text/plain')
+    r = HttpResponse(intro_text, content_type='text/html')
     longest = max([len(pair[0]) for pair in patterns])
     for key, value in patterns:
-        r.write('%s /%s\n' % (key.ljust(longest + 1), value))
+        r.write('%s <a href="%s">/%s</a><br>' % (key.ljust(longest + 1), value, value))
+    r.write('</pre>')
     return r
     
 def _get_named_patterns():
