@@ -8,7 +8,7 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'django_odbc.views.home', name='home'),
     # url(r'^django_odbc/', include('django_odbc.foo.urls')),
-    (r'categories/', 'turin.views.categories'),
+    url(r'categories/', 'turin.views.categories', name='categories'),
     (r'news/', include('turin.urls')),
     url(r'^$', 'turin.views.show_url_patterns', name='urls'),
 
