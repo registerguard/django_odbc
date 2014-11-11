@@ -19,7 +19,12 @@ import mx.ODBC.Manager as ODBC
 from lxml import objectify, etree
 
 def main():
-    connection = ODBC.DriverConnect('DSN=Dtnews')
+    try:
+        connection = ODBC.DriverConnect('DSN=Dtnews')
+    except mx.ODBC.Error.OperationalError, err:
+        # log this ... 
+        print error
+    
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
     cursor = connection.cursor()
