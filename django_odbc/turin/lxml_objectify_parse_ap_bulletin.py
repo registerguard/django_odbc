@@ -11,7 +11,7 @@ environ['DJANGO_SETTINGS_MODULE'] = 'django_odbc.settings'
 '''
 See
 http://www.saltycrane.com/blog/2011/07/example-parsing-xml-lxml-objectify/
-sftp://go.registerguard.com//rgcalendar/oper/WFA/processFeed.py
+sftp://go.registerguard.com//rgcalendar/oper/WFA/process_feed.py
 '''
 
 import mxodbc_django
