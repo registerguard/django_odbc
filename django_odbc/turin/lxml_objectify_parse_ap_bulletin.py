@@ -2,6 +2,7 @@
 # -*- coding:utf-8  -*-
 
 import sys
+import time
 sys.path.append('/Users/jheasly/Development/django_odbc/django_odbc')
 sys.path.append('/Users/jheasly/.virtualenvs/django_odbc/lib/python2.7/site-packages/egenix_mxodbc_django-1.2.0-py2.7-macosx-10.5-x86_64.egg')
 from os import environ
@@ -102,8 +103,8 @@ def main():
     
     connection.commit()
     
-    # Clean up once a day ... 
-    if 1 == 0:
+    # Clean up once a day at 3:15, 'cause, why not?
+    if (3, 15) == (time.localtime().tm_hour, time.localtime().tm_min):
         cursor.execute('''SELECT TOP 25 Id FROM dt_z_guide.apBulletin ORDER BY Id DESC''')
         nested_id_list = cursor.fetchall()
         id_list = [story_id[0] for story_id in nested_id_list]
