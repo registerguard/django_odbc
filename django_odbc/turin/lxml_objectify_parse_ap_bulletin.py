@@ -108,8 +108,8 @@ def main():
         cursor.execute('''SELECT TOP 25 Id FROM dt_z_guide.apBulletin ORDER BY Id DESC''')
         nested_id_list = cursor.fetchall()
         id_list = [story_id[0] for story_id in nested_id_list]
-        id_tuple = tuple(id_list)
-        cursor.execute('''DELETE FROM dt_z_guide.apBulletin WHERE id NOT IN (%s)''' % str(id_list))
+        id_tuple = str(tuple(id_list))
+        cursor.execute('''DELETE FROM dt_z_guide.apBulletin WHERE id NOT IN %s''' % id_tuple)
         print cursor.rowcount
         connection.commit()
     
