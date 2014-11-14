@@ -104,7 +104,7 @@ def main():
     
     connection.commit()
     
-    # Clean up once a day at 3:15, 'cause, why not?
+    # Clean up once a day at 3:15 a.m., 'cause, why not?
     if (3, 15) == (time.localtime().tm_hour, time.localtime().tm_min):
         cursor.execute('''SELECT TOP 25 Id FROM dt_z_guide.apBulletin ORDER BY Id DESC''')
         nested_id_list = cursor.fetchall()
