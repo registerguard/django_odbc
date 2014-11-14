@@ -17,12 +17,13 @@ sftp://go.registerguard.com//rgcalendar/oper/WFA/process_feed.py
 
 import mxodbc_django
 import mx.ODBC.Manager as ODBC
+from mx.ODBC.Error import OperationalError
 from lxml import objectify, etree
 
 def main():
     try:
         connection = ODBC.DriverConnect('DSN=Dtnews')
-    except mx.ODBC.Error.OperationalError, err:
+    except OperationalError, err:
         # log this ... 
         print error
     
