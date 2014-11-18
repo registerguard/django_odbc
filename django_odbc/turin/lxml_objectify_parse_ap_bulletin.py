@@ -25,7 +25,7 @@ def main():
         connection = ODBC.DriverConnect('DSN=Dtnews')
     except OperationalError, err:
         # log this ... 
-        print error
+        print err
     
     connection.encoding = 'utf-8'
     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
