@@ -23,19 +23,18 @@ from lxml import objectify, etree
 def main():
     try:
         connection = ODBC.DriverConnect('DSN=Dtnews')
+        connection.encoding = 'utf-8'
+        connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
+        cursor = connection.cursor()
+        cursor.execute('''SELECT TOP 1 storyId, storyName, created, subCategoryId, text FROM dbo.Story WHERE Story.priorityId = (SELECT priorityId FROM dbo.Priority WHERE Priority.priorityName = '05 Bulletin') 
+            AND Story.created > {fn TIMESTAMPADD(SQL_TSI_HOUR,-6,CURRENT_DATE)}
+            GROUP BY Story.textLength  
+            ORDER BY Story.created DESC''')
+        updates_list = cursor.fetchall()
+        cursor.close()
     except OperationalError, err:
         # log this ... 
         print err
-    
-    connection.encoding = 'utf-8'
-    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
-    cursor = connection.cursor()
-    cursor.execute('''SELECT TOP 1 storyId, storyName, created, subCategoryId, text FROM dbo.Story WHERE Story.priorityId = (SELECT priorityId FROM dbo.Priority WHERE Priority.priorityName = '05 Bulletin') 
-        AND Story.created > {fn TIMESTAMPADD(SQL_TSI_HOUR,-6,CURRENT_DATE)}
-        GROUP BY Story.textLength  
-        ORDER BY Story.created DESC''')
-    updates_list = cursor.fetchall()
-    cursor.close()
     
     '''
     
