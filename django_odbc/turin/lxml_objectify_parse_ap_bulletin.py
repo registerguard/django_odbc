@@ -31,6 +31,14 @@ def main():
             GROUP BY Story.textLength  
             ORDER BY Story.created DESC''')
         updates_list = getattr(cursor, 'fetchall', '')
+        if updates_list:
+           [storyId, storyName, created, subCategoryId, text] = updates_list()[0]
+#         print 'STORYID:', storyId
+#         print 'STORYNAME:', storyName
+#         print 'CREATED:', created
+#         print 'SUBCATEGORYID:', subCategoryId
+#         print 'TEXT:', text
+    
         cursor.close()
     except OperationalError, err:
         # log this ... 
@@ -48,15 +56,6 @@ def main():
     u'<?xml version="1.0" encoding="UTF-8"?>\n<?DTI version="1.0"?><DTGroup xmlns:dti="http://www.dtint.com/2006/Turin">\n\n\n\n<DTStory>\n\n<DTElement type_name="Headline" type="1" DTElementID="51904888" honorTypography="false" xmlns="http://www.dtint.com/2006/Turin" xmlns:x="adobe:ns:meta/">\n<text-nostyling>AP NewsAlert</text-nostyling>\n</DTElement>\n\n\n\n<DTElement type_name="Text" type="3" DTElementID="35621175" honorTypography="true" xmlns="http://www.dtint.com/2006/Turin" xmlns:x="adobe:ns:meta/">\n<text-nostyling>AP-US\u2014APNewsAlert,11<p/>AP NewsAlert<p/>WASHINGTON \u2014 Obama calls Republican effort to repeal health care law \u2018ideological fixation\u2019</text-nostyling>\n</DTElement>\n\n</DTStory>\n</DTGroup>\n'
     )]
     '''
-    if updates_list:
-       [storyId, storyName, created, subCategoryId, text] = updates_list[0]
-    
-#     print 'STORYID:', storyId
-#     print 'STORYNAME:', storyName
-#     print 'CREATED:', created
-#     print 'SUBCATEGORYID:', subCategoryId
-#     print 'TEXT:', text
-    
     try:
         root = objectify.fromstring(text.encode('utf-8'))
     except (UnboundLocalError, AttributeError):
