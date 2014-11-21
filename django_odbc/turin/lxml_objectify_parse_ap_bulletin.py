@@ -30,7 +30,7 @@ def main():
             AND Story.created > {fn TIMESTAMPADD(SQL_TSI_HOUR,-6,CURRENT_DATE)}
             GROUP BY Story.textLength  
             ORDER BY Story.created DESC''')
-        updates_list = cursor.fetchall()
+        updates_list = getattr(cursor, 'fetchall()', '')
         cursor.close()
     except OperationalError, err:
         # log this ... 
