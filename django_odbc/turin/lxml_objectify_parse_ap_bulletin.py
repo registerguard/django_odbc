@@ -78,8 +78,10 @@ def main():
     if created:
         print '    ', created
     
-    connection.encoding = 'utf-8'
-    connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
+      # may not need this ... 
+#     connection.encoding = 'utf-8'
+      # may not need this either ... 
+#     connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
     cursor = connection.cursor()
 #     print 'Before:', cursor.rowcount
     
