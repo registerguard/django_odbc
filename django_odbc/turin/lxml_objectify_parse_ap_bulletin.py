@@ -31,8 +31,12 @@ def main():
             GROUP BY Story.textLength
             ORDER BY Story.created DESC''')
         updates_list = getattr(cursor, 'fetchall', '')
-        if updates_list()[0]:
-           [storyId, storyName, created, subCategoryId, text] = updates_list()[0]
+        if updates_list:
+            try:
+                [storyId, storyName, created, subCategoryId, text] = updates_list()[0]
+            except IndexError, IndexErrorErr:
+                # log this too! ...
+                print IndexErrorErr
 #         print 'STORYID:', storyId
 #         print 'STORYNAME:', storyName
 #         print 'CREATED:', created
