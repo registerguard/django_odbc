@@ -193,7 +193,7 @@ def status(request):
                     AND 
                         foreignDblink.fileheaderid = cmspicture.fileheaderId  
                     AND 
-                        CMSPicture.TheCMSPictureVersion = 18 
+                        CMSPicture.TheCMSPictureVersion = 17 
                     AND 
                         Priority.priorityId = story.priorityId 
                     AND 
