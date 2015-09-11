@@ -13,8 +13,6 @@ class Command(BaseCommand):
         connection.stringformat = ODBC.NATIVE_UNICODE_STRINGFORMAT
         cursor = connection.cursor()
 
-        self.stdout.write(str(SUBCATEGORIES_TO_IGNORE))
-
         cursor.execute('''SELECT subCategoryName, subCategoryId FROM SubCategory WHERE subCategoryName NOT IN %s''' % (str(SUBCATEGORIES_TO_IGNORE)))
         results = cursor.fetchall()
         for result in results:
