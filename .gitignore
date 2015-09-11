@@ -5,3 +5,4 @@ django_odbc/turin/templates/turin/images/
 django_odbc/django_odbc/egenix*
 django_odbc/django_odbc/mxodbc_django*
 static/*
+django_odbc/turin/management/commands/settings.py
