@@ -1,3 +1,4 @@
+*.log
 *.pyc
 .DS_Store
 django_odbc/django_odbc/settings_local.py
@@ -6,3 +7,4 @@ django_odbc/django_odbc/egenix*
 django_odbc/django_odbc/mxodbc_django*
 static/*
 django_odbc/turin/management/commands/settings.py
+django_odbc/secrets.json
