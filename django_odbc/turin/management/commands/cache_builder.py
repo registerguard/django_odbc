@@ -1,12 +1,20 @@
+# -*- coding:utf-8  -*-
+
+import sys
+sys.path.append('/Users/jheasly/Development/django_odbc')
+sys.path.append('/Users/jheasly/Development/django_odbc/django_odbc')
+sys.path.append('/Users/jheasly/.virtualenvs/django_odbc/lib/python2.7/site-packages')
 import logging
 import logging.handlers
 import mxodbc_django
 import mx.ODBC.Manager as ODBC
 import os
+from os import environ
 import pprint
 import requests
 from cache_builder_settings import SUBCATEGORIES_TO_IGNORE
 from django.core.management.base import BaseCommand, CommandError
+environ['DJANGO_SETTINGS_MODULE'] = 'django_odbc.settings'
 
 class Command(BaseCommand):
     help = u'Requests subcategory indexes pages in order to build a cache.'
