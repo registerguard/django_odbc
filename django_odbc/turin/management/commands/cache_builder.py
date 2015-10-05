@@ -10,7 +10,7 @@ import mxodbc_django
 import mx.ODBC.Manager as ODBC
 import os
 from os import environ
-import pprint
+# import pprint
 import requests
 from cache_builder_settings import SUBCATEGORIES_TO_IGNORE
 from django.core.management.base import BaseCommand, CommandError
@@ -41,7 +41,7 @@ class Command(BaseCommand):
         subcategory_count_list = []
         for result in results:
             # ('Reviews', '153')
-            print result[0].encode('utf-8'), result[1]
+            # print result[0].encode('utf-8'), result[1]
             cursor.execute('''SELECT COUNT(*) FROM dbo.Story WHERE Story.subCategoryId=%s AND Story.deskId <> 11''' % str(result[1]))
             # [(1,)]
             story_count = cursor.fetchall()
@@ -63,4 +63,4 @@ class Command(BaseCommand):
             # subcategory_count_list.append()
 
         cursor.close()
-        pprint.pprint(subcategory_count_list)
+        # pprint.pprint(subcategory_count_list)
