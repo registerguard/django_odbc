@@ -1,4 +1,4 @@
-*.log
+*.log*
 *.pyc
 .DS_Store
 django_odbc/django_odbc/settings_local.py

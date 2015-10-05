@@ -41,13 +41,18 @@ class Command(BaseCommand):
         subcategory_count_list = []
         for result in results:
             # ('Reviews', '153')
-            print result[0], result[1]
+            print result[0].encode('utf-8'), result[1]
             cursor.execute('''SELECT COUNT(*) FROM dbo.Story WHERE Story.subCategoryId=%s AND Story.deskId <> 11''' % str(result[1]))
             # [(1,)]
             story_count = cursor.fetchall()
             self.stdout.write('%s stories in SubCategory %s' % (story_count[0][0], result[0]) )
             logger.debug('%s stories in SubCategory %s, Id: %s' % (story_count[0][0], result[0], result[1]))
             if int(story_count[0][0]):
+                # Delete older cache
+                # cursor.execute('''DELETE FROM custom_rg.Scraper WHERE name = 'si_%s' ''' % result[1])
+                # cache_clear_results = cursor.rowcount
+                # print 'cache_clear_results row count:', cache_clear_results
+                # connection.commit()
                 requests.get('http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
                 self.stdout.write('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
                 logger.debug('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s\n' % result[1])
