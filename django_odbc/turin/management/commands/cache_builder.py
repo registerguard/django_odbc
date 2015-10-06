@@ -45,7 +45,7 @@ class Command(BaseCommand):
             cursor.execute('''SELECT COUNT(*) FROM dbo.Story WHERE Story.subCategoryId=%s AND Story.deskId <> 11''' % str(result[1]))
             # [(1,)]
             story_count = cursor.fetchall()
-            self.stdout.write('%s stories in SubCategory %s' % (story_count[0][0], result[0]) )
+            # self.stdout.write('%s stories in SubCategory %s' % (story_count[0][0], result[0]) )
             logger.debug('%s stories in SubCategory %s, Id: %s' % (story_count[0][0], result[0], result[1]))
             if int(story_count[0][0]):
                 # Delete older cache
@@ -54,10 +54,10 @@ class Command(BaseCommand):
                 # print 'cache_clear_results row count:', cache_clear_results
                 # connection.commit()
                 requests.get('http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
-                self.stdout.write('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
+                # self.stdout.write('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
                 logger.debug('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s\n' % result[1])
             else:
-                self.stdout.write('Skipping subcategory %s. %s stories' % (result[0], story_count[0][0]))
+                # self.stdout.write('Skipping subcategory %s. %s stories' % (result[0], story_count[0][0]))
                 logger.debug('Skipping subcategory %s. %s stories\n' % (result[0], story_count[0][0]))
             # http://registerguard.com/rg/news/categories/?subcats=
             # subcategory_count_list.append()
