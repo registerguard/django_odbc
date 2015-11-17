@@ -12,6 +12,8 @@ import os
 from os import environ
 # import pprint
 import requests
+import time
+from requests.exceptions import ContentDecodingError
 from cache_builder_settings import SUBCATEGORIES_TO_IGNORE
 from django.core.management.base import BaseCommand, CommandError
 environ['DJANGO_SETTINGS_MODULE'] = 'django_odbc.settings'
@@ -53,9 +55,16 @@ class Command(BaseCommand):
                 # cache_clear_results = cursor.rowcount
                 # print 'cache_clear_results row count:', cache_clear_results
                 # connection.commit()
-                requests.get('http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
-                # self.stdout.write('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
-                logger.debug('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s\n' % result[1])
+                try:
+                    requests.get('http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
+                    # self.stdout.write('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
+                    logger.debug('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s\n' % result[1])
+                except ContentDecodingError:
+                    # requests barfs with ContentDecodingError. Who knows if that's really the issue.
+                    # Ennyways, wait 5 seconds and retry ...
+                    time.sleep(5)
+                    requests.get('http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
+                    logger.debug('SECOND REQUEST: http://registerguard.com/rg/news/categories/?subcats=%s\n' % result[1])
             else:
                 # self.stdout.write('Skipping subcategory %s. %s stories' % (result[0], story_count[0][0]))
                 logger.debug('Skipping subcategory %s. %s stories\n' % (result[0], story_count[0][0]))
