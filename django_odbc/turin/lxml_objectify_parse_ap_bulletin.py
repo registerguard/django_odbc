@@ -94,7 +94,9 @@ def main():
         # Check and see what the latest entry in DT is
         cursor.execute('''SELECT top 1 * FROM dt_z_guide.apBulletin ORDER BY id DESC''')
         [(latest_id, ap_timestamp, current_string, my_timestamp)] = cursor.fetchall()
+        ap_timestamp = ap_timestamp.encode('utf-8')
         current_string = current_string.encode('utf-8')
+        my_timestamp = my_timestamp.encode('utf-8')
         print u'Most recent in DT database:', latest_id, ap_timestamp, current_string, my_timestamp
 
 #     cursor.execute('''UPDATE dt_z_guide.apBulletin SET updateText = '%s', createdDateTime = '%s' WHERE ID=2''' % (last_graf, created))
