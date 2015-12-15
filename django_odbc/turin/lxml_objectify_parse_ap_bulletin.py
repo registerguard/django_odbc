@@ -41,7 +41,7 @@ def main():
 #         print 'STORYNAME:', storyName
 #         print 'CREATED:', created
 #         print 'SUBCATEGORYID:', subCategoryId
-#         print 'TEXT:', text
+#         print 'TEXT:', text.encode('utf-8')
 
         cursor.close()
     except OperationalError, err:
@@ -93,7 +93,7 @@ def main():
 
         # Check and see what the latest entry in DT is
         cursor.execute('''SELECT top 1 * FROM dt_z_guide.apBulletin ORDER BY id DESC''')
-        [(latest_id, ap_timestamp, current_string, my_timestamp)] = cursor.fetchall()
+        [(latest_id, ap_timestamp, my_timestamp, current_string)] = cursor.fetchall()
         ap_timestamp = ap_timestamp.encode('utf-8')
         current_string = current_string.encode('utf-8')
         my_timestamp = my_timestamp.encode('utf-8')
@@ -102,6 +102,9 @@ def main():
 #     cursor.execute('''UPDATE dt_z_guide.apBulletin SET updateText = '%s', createdDateTime = '%s' WHERE ID=2''' % (last_graf, created))
 #     cursor.execute('''INSERT INTO dt_z_guide.apBulletin (updateText, createdDateTime) VALUES ('WASHINGTON — US to reopen 18 of 19 embassies, consulates shuttered this week due to terrorist threat.', '2013-08-09 17:45:52.59')''')
 
+        print 'last_graf: \"%s\"' % last_graf
+        print 'current_string: \"%s\"' % current_string
+        print last_graf == current_string
         if (last_graf and current_string) and last_graf == current_string:
             print 'No CHANGE'
             # No change in update date, but we'll update logTimestamp
