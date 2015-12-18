@@ -37,11 +37,12 @@ def main():
             except IndexError, IndexErrorErr:
                 # log this too! ...
                 print IndexErrorErr
-#         print 'STORYID:', storyId
-#         print 'STORYNAME:', storyName
-#         print 'CREATED:', created
-#         print 'SUBCATEGORYID:', subCategoryId
-#         print 'TEXT:', text.encode('utf-8')
+        # print 'STORYID:', storyId
+        # print 'STORYNAME:', storyName
+        # # created is an mx.DateTime.DateTime!
+        # print 'CREATED:', created
+        # print 'SUBCATEGORYID:', subCategoryId
+        # print 'TEXT:', text.encode('utf-8')
 
         cursor.close()
     except OperationalError, err:
@@ -68,7 +69,6 @@ def main():
        root = ''
 
     last_graf = u''
-    created = u''
     try:
         for x in root.DTStory.getchildren():
             if x.attrib['type_name'] == 'Text':
@@ -98,9 +98,6 @@ def main():
         current_string = current_string.encode('utf-8')
         my_timestamp = my_timestamp.encode('utf-8')
         print u'Most recent in DT database:', latest_id, ap_timestamp, current_string, my_timestamp
-
-#     cursor.execute('''UPDATE dt_z_guide.apBulletin SET updateText = '%s', createdDateTime = '%s' WHERE ID=2''' % (last_graf, created))
-#     cursor.execute('''INSERT INTO dt_z_guide.apBulletin (updateText, createdDateTime) VALUES ('WASHINGTON — US to reopen 18 of 19 embassies, consulates shuttered this week due to terrorist threat.', '2013-08-09 17:45:52.59')''')
 
         if (last_graf and current_string) and last_graf == current_string:
             print 'No CHANGE'
