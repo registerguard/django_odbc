@@ -80,8 +80,10 @@ def main():
         print 'No DTStory element found'
     if last_graf:
         print '    ', last_graf
-    if created:
+    try:
         print '    ', created
+    except UnboundLocalError:
+        created = None
 
       # may not need this ...
 #     connection.encoding = 'utf-8'
