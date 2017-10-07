@@ -17,6 +17,7 @@ from requests.exceptions import ContentDecodingError
 from cache_builder_settings import SUBCATEGORIES_TO_IGNORE
 from django.core.management.base import BaseCommand, CommandError
 environ['DJANGO_SETTINGS_MODULE'] = 'django_odbc.settings'
+from custom_item_counts import ALTERNATE_COUNT, CUSTOM_ITEM_COUNTS
 
 class Command(BaseCommand):
     help = u'Requests subcategory indexes pages in order to build a cache.'
@@ -56,9 +57,13 @@ class Command(BaseCommand):
                 # print 'cache_clear_results row count:', cache_clear_results
                 # connection.commit()
                 try:
-                    requests.get('http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
-                    # self.stdout.write('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
-                    logger.debug('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s\n' % result[1])
+                    if result[1] in CUSTOM_ITEM_COUNTS:
+                        requests.get('http://registerguard.com/rg/news/categories/?subcats=%s&items=%s' % (result[1], str(ALTERNATE_COUNT)))
+                        logger.debug('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s&items=%s\n' % (result[1], str(ALTERNATE_COUNT)))
+                    else:
+                        requests.get('http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
+                        # self.stdout.write('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s' % result[1])
+                        logger.debug('Requesting page: http://registerguard.com/rg/news/categories/?subcats=%s\n' % result[1])
                 except ContentDecodingError:
                     # requests barfs with ContentDecodingError. Who knows if that's really the issue.
                     # Ennyways, wait 5 seconds and retry ...
